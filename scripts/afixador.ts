@@ -6,14 +6,15 @@ const dicPath = path.join(process.cwd(), 'public', 'pt_BR.dic');
 const outputDir = path.join(process.cwd(), 'src', 'json');
 
 // Caminhos dos arquivos de saída por faixa alfabética
-const outputPathABC = path.join(outputDir, 'pt_BR_extend_ABC.json');
-const outputPathDEF = path.join(outputDir, 'pt_BR_extend_DEF.json');
-const outputPathGHI = path.join(outputDir, 'pt_BR_extend_GHI.json');
-const outputPathJKL = path.join(outputDir, 'pt_BR_extend_JKL.json');
-const outputPathMNO = path.join(outputDir, 'pt_BR_extend_MNO.json');
-const outputPathPQR = path.join(outputDir, 'pt_BR_extend_PQR.json');
-const outputPathSTU = path.join(outputDir, 'pt_BR_extend_STU.json');
-const outputPathVXZ = path.join(outputDir, 'pt_BR_extend_VXZ.json');
+const outputPathAB = path.join(outputDir, 'pt_BR_extended_AB.json');
+const outputPathCD = path.join(outputDir, 'pt_BR_extended_CD.json');
+const outputPathEF = path.join(outputDir, 'pt_BR_extended_EF.json');
+const outputPathGHI = path.join(outputDir, 'pt_BR_extended_GHI.json');
+const outputPathJKL = path.join(outputDir, 'pt_BR_extended_JKL.json');
+const outputPathMNO = path.join(outputDir, 'pt_BR_extended_MNO.json');
+const outputPathPQR = path.join(outputDir, 'pt_BR_extended_PQR.json');
+const outputPathSTU = path.join(outputDir, 'pt_BR_extended_STU.json');
+const outputPathVXZ = path.join(outputDir, 'pt_BR_extended_VXZ.json');
 
 const rawAff = fs.readFileSync(affPath, 'utf-8');
 const rawDic = fs.readFileSync(dicPath, 'utf-8');
@@ -79,8 +80,9 @@ for (const line of affLines) {
 }
 
 // Mapeamentos por grupos alfabéticos
-const mapABC: { [key: string]: { [flag: string]: string[] } } = {};
-const mapDEF: { [key: string]: { [flag: string]: string[] } } = {};
+const mapAB: { [key: string]: { [flag: string]: string[] } } = {};
+const mapCD: { [key: string]: { [flag: string]: string[] } } = {};
+const mapEF: { [key: string]: { [flag: string]: string[] } } = {};
 const mapGHI: { [key: string]: { [flag: string]: string[] } } = {};
 const mapJKL: { [key: string]: { [flag: string]: string[] } } = {};
 const mapMNO: { [key: string]: { [flag: string]: string[] } } = {};
@@ -90,8 +92,9 @@ const mapVXZ: { [key: string]: { [flag: string]: string[] } } = {};
 
 // Função para selecionar o mapa certo com base na primeira letra
 function getMapByFirstLetter(letter: string) {
-  if ('abc'.includes(letter)) return mapABC;
-  if ('def'.includes(letter)) return mapDEF;
+  if ('abc'.includes(letter)) return mapAB;
+  if ('def'.includes(letter)) return mapCD;
+  if ('def'.includes(letter)) return mapEF;
   if ('ghi'.includes(letter)) return mapGHI;
   if ('jkl'.includes(letter)) return mapJKL;
   if ('mno'.includes(letter)) return mapMNO;
@@ -180,8 +183,9 @@ for (let line of dicLines) {
 }
 
 // Escrita dos arquivos
-fs.writeFileSync(outputPathABC, JSON.stringify(mapABC, null, 2), 'utf-8');
-fs.writeFileSync(outputPathDEF, JSON.stringify(mapDEF, null, 2), 'utf-8');
+fs.writeFileSync(outputPathAB, JSON.stringify(mapAB, null, 2), 'utf-8');
+fs.writeFileSync(outputPathCD, JSON.stringify(mapCD, null, 2), 'utf-8');
+fs.writeFileSync(outputPathEF, JSON.stringify(mapEF, null, 2), 'utf-8');
 fs.writeFileSync(outputPathGHI, JSON.stringify(mapGHI, null, 2), 'utf-8');
 fs.writeFileSync(outputPathJKL, JSON.stringify(mapJKL, null, 2), 'utf-8');
 fs.writeFileSync(outputPathMNO, JSON.stringify(mapMNO, null, 2), 'utf-8');
@@ -189,4 +193,4 @@ fs.writeFileSync(outputPathPQR, JSON.stringify(mapPQR, null, 2), 'utf-8');
 fs.writeFileSync(outputPathSTU, JSON.stringify(mapSTU, null, 2), 'utf-8');
 fs.writeFileSync(outputPathVXZ, JSON.stringify(mapVXZ, null, 2), 'utf-8');
 
-console.log('✅ Arquivos JSON gerados: ABC, DEF, GHI, JKL, MNO, PQR, STU, VXZ');
+console.log('✅ Arquivos JSON gerados: AB, CD, EF, GHI, JKL, MNO, PQR, STU, VXZ');

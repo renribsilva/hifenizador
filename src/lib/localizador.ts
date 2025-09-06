@@ -1,11 +1,12 @@
-import dataABC from "../json/pt_BR_extend_ABC.json";
-import dataDEF from "../json/pt_BR_extend_DEF.json";
-import dataGHI from "../json/pt_BR_extend_GHI.json";
-import dataJKL from "../json/pt_BR_extend_JKL.json";
-import dataMNO from "../json/pt_BR_extend_MNO.json";
-import dataPQR from "../json/pt_BR_extend_PQR.json";
-import dataSTU from "../json/pt_BR_extend_STU.json";
-import dataVXZ from "../json/pt_BR_extend_VXZ.json";
+import dataAB from "../json/pt_BR_extended_AB.json";
+import dataCD from "../json/pt_BR_extended_CD.json";
+import dataEF from "../json/pt_BR_extended_EF.json";
+import dataGHI from "../json/pt_BR_extended_GHI.json";
+import dataJKL from "../json/pt_BR_extended_JKL.json";
+import dataMNO from "../json/pt_BR_extended_MNO.json";
+import dataPQR from "../json/pt_BR_extended_PQR.json";
+import dataSTU from "../json/pt_BR_extended_STU.json";
+import dataVXZ from "../json/pt_BR_extended_VXZ.json";
 
 type ExtendedWordMap = {
   [word: string]: {
@@ -15,8 +16,9 @@ type ExtendedWordMap = {
 
 // Junta os dois arquivos em um único objeto
 const extendedData: ExtendedWordMap = {
-  ...dataABC,
-  ...dataDEF,
+  ...dataAB,
+  ...dataCD,
+  ...dataEF,
   ...dataGHI,
   ...dataJKL,
   ...dataMNO,
