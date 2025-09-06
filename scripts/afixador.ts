@@ -5,9 +5,15 @@ const affPath = path.join(process.cwd(), 'public', 'pt_BR.aff');
 const dicPath = path.join(process.cwd(), 'public', 'pt_BR.dic');
 const outputDir = path.join(process.cwd(), 'src', 'json');
 
-const outputPathAtoD = path.join(outputDir, 'pt_BR_extend_AD.json');
-const outputPathEtoM = path.join(outputDir, 'pt_BR_extend_EM.json');
-const outputPathNtoZ = path.join(outputDir, 'pt_BR_extend_NZ.json');
+// Caminhos dos arquivos de saída por faixa alfabética
+const outputPathABC = path.join(outputDir, 'pt_BR_extend_ABC.json');
+const outputPathDEF = path.join(outputDir, 'pt_BR_extend_DEF.json');
+const outputPathGHI = path.join(outputDir, 'pt_BR_extend_GHI.json');
+const outputPathJKL = path.join(outputDir, 'pt_BR_extend_JKL.json');
+const outputPathMNO = path.join(outputDir, 'pt_BR_extend_MNO.json');
+const outputPathPQR = path.join(outputDir, 'pt_BR_extend_PQR.json');
+const outputPathSTU = path.join(outputDir, 'pt_BR_extend_STU.json');
+const outputPathVXZ = path.join(outputDir, 'pt_BR_extend_VXZ.json');
 
 const rawAff = fs.readFileSync(affPath, 'utf-8');
 const rawDic = fs.readFileSync(dicPath, 'utf-8');
@@ -41,7 +47,7 @@ const affData = {
   SFX: {} as any
 };
 
-// Processa regras de prefixos e sufixos
+// Processamento de prefixos e sufixos
 for (const line of affLines) {
   const parts = line.split(/\s+/);
 
@@ -72,11 +78,31 @@ for (const line of affLines) {
   }
 }
 
-// Mapas divididos
-const wordMapAtoD: { [key: string]: { [flag: string]: string[] } } = {};
-const wordMapEtoM: { [key: string]: { [flag: string]: string[] } } = {};
-const wordMapNtoZ: { [key: string]: { [flag: string]: string[] } } = {};
+// Mapeamentos por grupos alfabéticos
+const mapABC: { [key: string]: { [flag: string]: string[] } } = {};
+const mapDEF: { [key: string]: { [flag: string]: string[] } } = {};
+const mapGHI: { [key: string]: { [flag: string]: string[] } } = {};
+const mapJKL: { [key: string]: { [flag: string]: string[] } } = {};
+const mapMNO: { [key: string]: { [flag: string]: string[] } } = {};
+const mapPQR: { [key: string]: { [flag: string]: string[] } } = {};
+const mapSTU: { [key: string]: { [flag: string]: string[] } } = {};
+const mapVXZ: { [key: string]: { [flag: string]: string[] } } = {};
 
+// Função para selecionar o mapa certo com base na primeira letra
+function getMapByFirstLetter(letter: string) {
+  if ('abc'.includes(letter)) return mapABC;
+  if ('def'.includes(letter)) return mapDEF;
+  if ('ghi'.includes(letter)) return mapGHI;
+  if ('jkl'.includes(letter)) return mapJKL;
+  if ('mno'.includes(letter)) return mapMNO;
+  if ('pqr'.includes(letter)) return mapPQR;
+  if ('stu'.includes(letter)) return mapSTU;
+
+  // Tudo o que sobrar vai para mapVXZ
+  return mapVXZ;
+}
+
+// Geração das variações por linha
 for (let line of dicLines) {
   line = line.trim();
 
@@ -146,19 +172,21 @@ for (let line of dicLines) {
 
   if (Object.keys(wordVariations).length > 0) {
     const firstLetter = word[0].toLowerCase();
-    if (firstLetter >= 'a' && firstLetter <= 'd') {
-      wordMapAtoD[word] = wordVariations;
-    } else if (firstLetter >= 'e' && firstLetter <= 'm') {
-      wordMapEtoM[word] = wordVariations;
-    } else {
-      wordMapNtoZ[word] = wordVariations;
+    const targetMap = getMapByFirstLetter(firstLetter);
+    if (targetMap) {
+      targetMap[word] = wordVariations;
     }
   }
 }
 
-// Salva arquivos separados
-fs.writeFileSync(outputPathAtoD, JSON.stringify(wordMapAtoD, null, 2), 'utf-8');
-fs.writeFileSync(outputPathEtoM, JSON.stringify(wordMapEtoM, null, 2), 'utf-8');
-fs.writeFileSync(outputPathNtoZ, JSON.stringify(wordMapNtoZ, null, 2), 'utf-8');
+// Escrita dos arquivos
+fs.writeFileSync(outputPathABC, JSON.stringify(mapABC, null, 2), 'utf-8');
+fs.writeFileSync(outputPathDEF, JSON.stringify(mapDEF, null, 2), 'utf-8');
+fs.writeFileSync(outputPathGHI, JSON.stringify(mapGHI, null, 2), 'utf-8');
+fs.writeFileSync(outputPathJKL, JSON.stringify(mapJKL, null, 2), 'utf-8');
+fs.writeFileSync(outputPathMNO, JSON.stringify(mapMNO, null, 2), 'utf-8');
+fs.writeFileSync(outputPathPQR, JSON.stringify(mapPQR, null, 2), 'utf-8');
+fs.writeFileSync(outputPathSTU, JSON.stringify(mapSTU, null, 2), 'utf-8');
+fs.writeFileSync(outputPathVXZ, JSON.stringify(mapVXZ, null, 2), 'utf-8');
 
-console.log('Arquivos JSON AD, EM e NZ gerados com sucesso!');
+console.log('✅ Arquivos JSON gerados: ABC, DEF, GHI, JKL, MNO, PQR, STU, VXZ');
