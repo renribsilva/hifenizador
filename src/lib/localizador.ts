@@ -8,13 +8,20 @@ import dataPQR from "../json/pt_BR_extended_PQR.json";
 import dataSTU from "../json/pt_BR_extended_STU.json";
 import dataVXZ from "../json/pt_BR_extended_VXZ.json";
 
+// Tipagem
 type ExtendedWordMap = {
   [word: string]: {
     [flag: string]: string[];
   };
 };
 
-// Junta os dois arquivos em um único objeto
+type MatchEntry = {
+  word: string;
+  flag: string;
+  variations: string[];
+};
+
+// Junta todos os arquivos em um único objeto
 const extendedData: ExtendedWordMap = {
   ...dataAB,
   ...dataCD,
@@ -24,51 +31,57 @@ const extendedData: ExtendedWordMap = {
   ...dataMNO,
   ...dataPQR,
   ...dataSTU,
-  ...dataVXZ
+  ...dataVXZ,
 };
 
+// Função de filtro
 function filterWords(
   data: ExtendedWordMap,
   search: string,
-  type: 'starts' | 'contains' | 'ends'
-): ExtendedWordMap {
-
-  const result: ExtendedWordMap = {};
+  type: "starts" | "contains" | "ends"
+): MatchEntry[] {
+  const result: MatchEntry[] = [];
 
   for (const word of Object.keys(data)) {
-
-    const wordVariations: { [flag: string]: string[] } = {};
-
     for (const flag of Object.keys(data[word])) {
-
       const matches: string[] = [];
 
       for (const variation of data[word][flag]) {
         if (
-          (type === 'starts' && variation.startsWith(search)) ||
-          (type === 'contains' && variation.includes(search)) ||
-          (type === 'ends' && variation.endsWith(search))
+          (type === "starts" && variation.startsWith(search)) ||
+          (type === "contains" && variation.includes(search)) ||
+          (type === "ends" && variation.endsWith(search))
         ) {
           matches.push(variation);
-          matches.push(word);
+          matches.push(word); // inclui a palavra original também
         }
       }
 
       if (matches.length > 0) {
-        wordVariations[flag] = Array.from(new Set(matches));
+        result.push({
+          word,
+          flag,
+          variations: Array.from(new Set(matches)) // remove duplicatas
+        });
       }
-    }
-
-    if (Object.keys(wordVariations).length > 0) {
-      result[word] = wordVariations;
     }
   }
 
   return result;
 }
 
+// Uso da função
 const searchTerm = "inar";
-const searchType = "ends"; // 'starts' | 'contains' | 'ends'
+const searchType = "ends"; // "starts" | "contains" | "ends"
 
 const results = filterWords(extendedData, searchTerm, searchType);
-console.log(JSON.stringify(results, null, 2));
+
+let list: string[] = [];
+
+for (const entry of results) {
+  list.push(...entry.variations);
+}
+
+list = Array.from(new Set(list));
+
+console.log(list);
