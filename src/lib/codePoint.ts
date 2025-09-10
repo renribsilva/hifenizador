@@ -1,0 +1,1 @@
+console.log(String.fromCodePoint(0x0070))

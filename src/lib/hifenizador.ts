@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-const hyph_path = path.join(process.cwd(), 'public', 'hyph_pt_BR.dic')
+const hyph_path = path.join(process.cwd(), 'public', 'ref_LibreOffice','hyph_pt_BR.dic')
 const rawPatterns = fs.readFileSync(hyph_path, 'utf-8')
   .split(/\r?\n/)
   .map(line => line.trim())
@@ -145,7 +145,7 @@ export function hifenizador(word: string, rawPatterns: string[]) {
       .replace(/^-+|-+$/g, '')
       .replace(/-{2,}/g, '-');
 
-    // console.log("Palavra reconstruída:", reconstructed); 
+    console.log("Palavra reconstruída:", reconstructed); 
   }
 
   return { getWord: getWord, word: reconstructed };
@@ -153,4 +153,4 @@ export function hifenizador(word: string, rawPatterns: string[]) {
 }
 
 // Exemplo
-// hifenizador("glossário", rawPatterns);
+hifenizador("glossário", rawPatterns);

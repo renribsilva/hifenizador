@@ -1,0 +1,20 @@
+{
+  "0070":{
+    "description": "voiceless bilabial plosive",
+    "IPA_name": "lower-case p",
+    "IPA_number":"101",
+    "Unicode_name":"latin small letter p",
+    "Unicode_range":"basic latin",
+    "TIPA_code":"p",
+    "AFII_code":"E2A2"
+  },
+  "0062":{
+    "description": "voiced bilabial plosive",
+    "IPA_name": "lower-case b",
+    "IPA_number":"102",
+    "Unicode_name":"latin small letter b",
+    "Unicode_range":"basic latin",
+    "TIPA_code":"b",
+    "AFII_code":"E2A3"
+  }
+}

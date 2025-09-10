@@ -1,0 +1,1 @@
+"Tabela IPA, http://www.internationalphoneticassociation.org/content/ipa-chart , disponível sob uma Licença Creative Commons Atribuição-CompartilhaIgual 3.0 Não Adaptada. Copyright © 2018 International Phonetic Association."
