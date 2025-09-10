@@ -27,7 +27,7 @@ export function hifenizador(word: string, rawPatterns: string[]) {
     for (let start = 0; start <= w1.length - size; start++) {
       const segment = w1.slice(start, start + size);
       rawPatterns.forEach(p => {
-        if (p.replace(/\d+/g, '') === segment) {
+        if (p?.replace(/\d+/g, '') === segment) {
           matches.push({
             pattern: segment,
             start: start * 2,   
@@ -128,16 +128,16 @@ export function hifenizador(word: string, rawPatterns: string[]) {
     matrix.push(maxRow.map((v, col) => 
       v === Number.NEGATIVE_INFINITY ? matrix[0][col] : v.toString()));
 
-    console.log("Matriz final:");
-    matrix.forEach(row => {
-      console.log(row.map(v => (v === null ? '.' : v)).join(' '));
-    });
+    // console.log("Matriz final:");
+    // matrix.forEach(row => {
+    //   console.log(row.map(v => (v === null ? '.' : v)).join(' '));
+    // });
 
     const lastRow = matrix[matrix.length - 1];
 
     reconstructed = lastRow
       .map(v => {
-        if (v === '1') return '-';
+        if (/^\d$/.test(v) && Number(v) % 2 === 1) return '-';
         if (v === '.' || /^\d$/.test(v)) return '';
         return v;
       })
@@ -145,7 +145,7 @@ export function hifenizador(word: string, rawPatterns: string[]) {
       .replace(/^-+|-+$/g, '')
       .replace(/-{2,}/g, '-');
 
-    console.log("Palavra reconstruída:", reconstructed); 
+    // console.log("Palavra reconstruída:", reconstructed); 
   }
 
   return { getWord: getWord, word: reconstructed };
@@ -153,4 +153,4 @@ export function hifenizador(word: string, rawPatterns: string[]) {
 }
 
 // Exemplo
-hifenizador("silábicas", rawPatterns);
+// hifenizador("glossário", rawPatterns);

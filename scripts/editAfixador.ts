@@ -1,24 +1,16 @@
 import fs from "fs";
 import path from "path";
 
+// Caminhos dos arquivos
 const affPath = path.join(process.cwd(), "public", "pt_BR.aff");
 const dicPath = path.join(process.cwd(), "public", "pt_BR.dic");
-const outputDir = path.join(process.cwd(), "src", "json");
+const outputDir = path.join(process.cwd(), "src", "json", "ptBRJson");
 
-// Caminhos dos arquivos de saída por faixa alfabética
-const outputPathAB = path.join(outputDir, "pt_BR_extended_AB.json");
-const outputPathCD = path.join(outputDir, "pt_BR_extended_CD.json");
-const outputPathEF = path.join(outputDir, "pt_BR_extended_EF.json");
-const outputPathGHI = path.join(outputDir, "pt_BR_extended_GHI.json");
-const outputPathJKL = path.join(outputDir, "pt_BR_extended_JKL.json");
-const outputPathMNO = path.join(outputDir, "pt_BR_extended_MNO.json");
-const outputPathPQR = path.join(outputDir, "pt_BR_extended_PQR.json");
-const outputPathSTU = path.join(outputDir, "pt_BR_extended_STU.json");
-const outputPathVXZ = path.join(outputDir, "pt_BR_extended_VXZ.json");
-
+// Leitura dos arquivos .aff e .dic
 const rawAff = fs.readFileSync(affPath, "utf-8");
 const rawDic = fs.readFileSync(dicPath, "utf-8");
 
+// Processamento das linhas do arquivo .aff
 const affLines = rawAff
   .split(/\r?\n/)
   .map(line => line.trim())
@@ -39,6 +31,7 @@ const affLines = rawAff
       !line.includes("WARN ~")
   );
 
+// Processamento das linhas do arquivo .dic
 const dicLines = rawDic
   .split(/\r?\n/)
   .filter(Boolean);
@@ -60,7 +53,7 @@ for (const line of affLines) {
       affData.PFX[name].rules.push({
         strip: parts[2],
         add: parts[3],
-        condition: parts[4] === "0" || parts[4] === "." ? null : parts[4]
+        condition: parts[4] === "." ? null : parts[4]
       });
     }
   }
@@ -79,30 +72,18 @@ for (const line of affLines) {
   }
 }
 
-// Mapeamentos por grupos alfabéticos
-const mapAB: { [key: string]: { [flag: string]: string[] } } = {};
-const mapCD: { [key: string]: { [flag: string]: string[] } } = {};
-const mapEF: { [key: string]: { [flag: string]: string[] } } = {};
-const mapGHI: { [key: string]: { [flag: string]: string[] } } = {};
-const mapJKL: { [key: string]: { [flag: string]: string[] } } = {};
-const mapMNO: { [key: string]: { [flag: string]: string[] } } = {};
-const mapPQR: { [key: string]: { [flag: string]: string[] } } = {};
-const mapSTU: { [key: string]: { [flag: string]: string[] } } = {};
-const mapVXZ: { [key: string]: { [flag: string]: string[] } } = {};
+// Mapas por letras do alfabeto
+const alphabetMaps: { [letter: string]: { [word: string]: { [flag: string]: string[] } } } = {};
 
-// Função para selecionar o mapa certo com base na primeira letra
+// Função para selecionar o mapa certo com base na primeira letra (sem acento)
 function getMapByFirstLetter(letter: string) {
-  if ("abc".includes(letter)) {return mapAB;}
-  if ("def".includes(letter)) {return mapCD;}
-  if ("def".includes(letter)) {return mapEF;}
-  if ("ghi".includes(letter)) {return mapGHI;}
-  if ("jkl".includes(letter)) {return mapJKL;}
-  if ("mno".includes(letter)) {return mapMNO;}
-  if ("pqr".includes(letter)) {return mapPQR;}
-  if ("stu".includes(letter)) {return mapSTU;}
+  const normalizedLetter = letter.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  return alphabetMaps[normalizedLetter] || (alphabetMaps[normalizedLetter] = {});
+}
 
-  // Tudo o que sobrar vai para mapVXZ
-  return mapVXZ;
+// Criação da pasta ptBRJson se não existir
+if (!fs.existsSync(outputDir)) {
+  fs.mkdirSync(outputDir, { recursive: true });
 }
 
 // Geração das variações por linha
@@ -118,9 +99,18 @@ for (let line of dicLines) {
   const flags = rawFlags ? rawFlags.split("") : [];
   const wordVariations: { [flag: string]: string[] } = {};
 
+  const ignoredFlags = new Set([
+    "5", "6", "7", "8", "9", "k", "a", "c", "d", "e", "f", "g", "h", "i", "j",
+    "k", "m", "n", "o", "p", "q", "r", "s", "v", "E", "G", "L", "O", "P", 
+    "Q", "R", "S", "T", "U", "V", "W"
+  ]);
+
   for (const flag of flags) {
-    
-    let pfxWord = word;
+
+    if (ignoredFlags.has(flag)) {
+      continue;
+    }
+
     const variations: string[] = [];
 
     if (affData.PFX[flag]) {
@@ -134,7 +124,6 @@ for (let line of dicLines) {
           }
           const newWord = rule.add + baseWord;
           variations.push(newWord);
-          pfxWord = newWord;
         }
       }
     }
@@ -154,28 +143,73 @@ for (let line of dicLines) {
       }
     }
 
-    if (affData.PFX[flag]?.cross && affData.SFX[flag]?.cross) {
-      for (const rule of affData.SFX[flag].rules) {
-        let baseWord = pfxWord;
-        const regex = rule.condition ? new RegExp(`${rule.condition}$`) : null;
+    if (variations.length > 0) {
+      if (!wordVariations[flag]) {
+        wordVariations[flag] = [];
+      }
+      variations.forEach(variation => {
+        if (!wordVariations[flag].includes(variation)) {
+          wordVariations[flag].push(variation);
+        }
+      });
+    }
+  }
 
-        if (!regex || regex.test(word)) {
-          if (rule.strip && rule.strip !== "0") {
-            baseWord = baseWord.replace(new RegExp(`${rule.strip}$`), "");
+  const flagComb = [];
+  for (let i = 0; i < flags.length; i++) {
+    for (let j = i + 1; j < flags.length; j++) {
+      flagComb.push([flags[i], flags[j]]);
+    }
+  }
+
+  const pfxFlags = "ÀÁÂÃÄÈÉÊËÌÍÎÏÒÓÔÕÖÙÚÛÜÑÝàáâãäèéêëìíîïòóôõöùúûüñÿ";
+  const sfxFlags = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+
+  const X = () => {
+    return flagComb.filter(([first, second]) => {
+      return ((pfxFlags.includes(first) && sfxFlags.includes(second)) ||
+            (sfxFlags.includes(first) && pfxFlags.includes(second)));
+    });
+  };
+
+  const flagCombFiltered = X();
+
+  if (flagCombFiltered.length > 0) { 
+    const variations: string[] = [];
+
+    for (const [flag1, flag2] of flagCombFiltered) {
+      if (affData.PFX[flag2]?.cross && affData.SFX[flag1]?.cross) {
+        const pfxRules = affData.PFX[flag2].rules;
+        for (const rule of pfxRules) {
+          let baseWord = word;
+          const regex = rule.condition ? new RegExp(`^${rule.condition}`) : null;
+          if (!regex || regex.test(word)) {
+            if (rule.strip && rule.strip !== "0") {
+              baseWord = baseWord.replace(new RegExp(`^${rule.strip}`), "");
+            }
+            const intermediateWord = rule.add + baseWord;
+            const sfxRules = affData.SFX[flag1].rules;
+            for (const sfxRule of sfxRules) {
+              let finalWord = intermediateWord;
+              const sfxRegex = sfxRule.condition ? new RegExp(`${sfxRule.condition}$`) : null;
+              if (!sfxRegex || sfxRegex.test(intermediateWord)) {
+                if (sfxRule.strip && sfxRule.strip !== "0") {
+                  finalWord = finalWord.replace(new RegExp(`${sfxRule.strip}$`), "");
+                }
+                finalWord += sfxRule.add;
+                variations.push(finalWord);
+                wordVariations[`${flag2}+${flag1}`] = wordVariations[`${flag2}+${flag1}`] || [];
+                wordVariations[`${flag2}+${flag1}`].push(finalWord);
+              }
+            }
           }
-          const newWord = baseWord + rule.add;
-          variations.push(newWord);
         }
       }
-    }
-
-    if (variations.length > 0) {
-      wordVariations[flag] = Array.from(new Set(variations));
     }
   }
 
   if (Object.keys(wordVariations).length > 0) {
-    const firstLetter = word[0].toLowerCase();
+    const firstLetter = word[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     const targetMap = getMapByFirstLetter(firstLetter);
     if (targetMap) {
       targetMap[word] = wordVariations;
@@ -183,15 +217,10 @@ for (let line of dicLines) {
   }
 }
 
-// Escrita dos arquivos
-fs.writeFileSync(outputPathAB, JSON.stringify(mapAB, null, 2), "utf-8");
-fs.writeFileSync(outputPathCD, JSON.stringify(mapCD, null, 2), "utf-8");
-fs.writeFileSync(outputPathEF, JSON.stringify(mapEF, null, 2), "utf-8");
-fs.writeFileSync(outputPathGHI, JSON.stringify(mapGHI, null, 2), "utf-8");
-fs.writeFileSync(outputPathJKL, JSON.stringify(mapJKL, null, 2), "utf-8");
-fs.writeFileSync(outputPathMNO, JSON.stringify(mapMNO, null, 2), "utf-8");
-fs.writeFileSync(outputPathPQR, JSON.stringify(mapPQR, null, 2), "utf-8");
-fs.writeFileSync(outputPathSTU, JSON.stringify(mapSTU, null, 2), "utf-8");
-fs.writeFileSync(outputPathVXZ, JSON.stringify(mapVXZ, null, 2), "utf-8");
+// Escrita dos arquivos por letra
+Object.entries(alphabetMaps).forEach(([letter, map]) => {
+  const outputPath = path.join(outputDir, `${letter.toUpperCase()}.json`);
+  fs.writeFileSync(outputPath, JSON.stringify(map, null, 2), "utf-8");
+});
 
-console.log("Arquivos JSON gerados: AB, CD, EF, GHI, JKL, MNO, PQR, STU, VXZ");
+console.log("Arquivos JSON gerados por letra do alfabeto.");
