@@ -1,12 +1,12 @@
-import dataAB from "../json/pt_BR_extended_AB.json";
-import dataCD from "../json/pt_BR_extended_CD.json";
-import dataEF from "../json/pt_BR_extended_EF.json";
-import dataGHI from "../json/pt_BR_extended_GHI.json";
-import dataJKL from "../json/pt_BR_extended_JKL.json";
-import dataMNO from "../json/pt_BR_extended_MNO.json";
-import dataPQR from "../json/pt_BR_extended_PQR.json";
-import dataSTU from "../json/pt_BR_extended_STU.json";
-import dataVXZ from "../json/pt_BR_extended_VXZ.json";
+// import dataAB from "../json/pt_BR_extended_AB.json";
+// import dataCD from "../json/pt_BR_extended_CD.json";
+// import dataEF from "../json/pt_BR_extended_EF.json";
+// import dataGHI from "../json/pt_BR_extended_GHI.json";
+// import dataJKL from "../json/pt_BR_extended_JKL.json";
+// import dataMNO from "../json/pt_BR_extended_MNO.json";
+// import dataPQR from "../json/pt_BR_extended_PQR.json";
+// import dataSTU from "../json/pt_BR_extended_STU.json";
+// import dataVXZ from "../json/pt_BR_extended_VXZ.json";
 
 // Tipagem
 type ExtendedWordMap = {
@@ -23,15 +23,15 @@ type MatchEntry = {
 
 // Junta todos os arquivos em um único objeto
 const extendedData: ExtendedWordMap = {
-  ...dataAB,
-  ...dataCD,
-  ...dataEF,
-  ...dataGHI,
-  ...dataJKL,
-  ...dataMNO,
-  ...dataPQR,
-  ...dataSTU,
-  ...dataVXZ,
+  // ...dataAB,
+  // ...dataCD,
+  // ...dataEF,
+  // ...dataGHI,
+  // ...dataJKL,
+  // ...dataMNO,
+  // ...dataPQR,
+  // ...dataSTU,
+  // ...dataVXZ,
 };
 
 // Função de filtro
